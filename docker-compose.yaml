@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: root123
+    ports:
+      - "5432:5432"
+    networks:
+      - pg-metabase-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  metabase:
+    image: metabase/metabase
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    networks:
+      - pg-metabase-network
+    volumes:
+      - metabase-data:/metabase.db
+
+networks:
+  pg-metabase-network:
+    name: pg-metabase-network
+
+volumes:
+  pgdata:
+  metabase-data:
