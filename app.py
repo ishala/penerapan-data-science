@@ -104,7 +104,6 @@ st.markdown('## **Student Performances**')
 st.write('Please edit on the tables below!')
 
 st.markdown("### **Curricular Units**")
-
 edited_curr_df = st.data_editor(curricular_df, 
                                 hide_index=True,
                                 disabled=['Curricular Type'])
@@ -122,12 +121,10 @@ econ_press = econ_pressure(gender, marital, debtor,
                            unemploy_rate, inflation_rate)
 
 st.markdown("### **Student Grades**")
-
-
 edited_grd_df = st.data_editor(grade_df, hide_index=True)
 
 # Calculate Weighted Avg Grade
-edited_grd_df, weighted_avg_grade = weighted_avg_grade(edited_curr_df, edited_grd_df)
+edited_grd_df, weighted_avg_grd = weighted_avg_grade(edited_curr_df, edited_grd_df)
 
 st.subheader(':blue[Student Performance Result]')
 
@@ -140,4 +137,5 @@ with col1_perform:
 
 with col2_perform:
     st.markdown(f'**Total Approval Rate:** {approval_rate}')
+    st.markdown(f'**Average Grade:** {weighted_avg_grd}')
     st.markdown(f'**Student Economy Pressure:** {econ_press}')
