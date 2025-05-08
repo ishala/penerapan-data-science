@@ -7,12 +7,14 @@ def total_units_enrolled(df):
     
     total_enrolled_un = int(first_sem) + int(second_sem)
 
-    new_row = pd.DataFrame([{
-        'Curricular Type': 'Total Units Enrolled',
-        'Total Units': total_enrolled_un
-    }])
-
-    df = pd.concat([df, new_row], ignore_index=True)
+    if 'Total Units Enrolled' in df['Curricular Type'].values:
+        df.loc[df['Curricular Type'] == 'Total Units Enrolled', 'Total Units'] = total_enrolled_un
+    else:
+        new_row = pd.DataFrame([{
+            'Curricular Type': 'Total Units Enrolled',
+            'Total Units': total_enrolled_un
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
 
     return df, total_enrolled_un
 
@@ -21,49 +23,57 @@ def total_units_approved(df):
     second_sem = df[df['Curricular Type'] == '2nd Semester Approved']['Total Units'].values[0]
     total_approved_un = int(first_sem) + int(second_sem)
 
-    new_row = pd.DataFrame([{
-        'Curricular Type': 'Total Units Approved',
-        'Total Units': total_approved_un
-    }])
-    
-    df = pd.concat([df, new_row], ignore_index=True)
+    if 'Total Units Approved' in df['Curricular Type'].values:
+        df.loc[df['Curricular Type'] == 'Total Units Approved', 'Total Units'] = total_approved_un
+    else:
+        new_row = pd.DataFrame([{
+            'Curricular Type': 'Total Units Approved',
+            'Total Units': total_approved_un
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
 
     return df, total_approved_un
+
 
 def units_without_eval(df):
     first_no_eval = df[df['Curricular Type'] == '1st Semester No Eval']['Total Units'].values[0]
     second_no_eval = df[df['Curricular Type'] == '2nd Semester No Eval']['Total Units'].values[0]
-    without_eval = (int(first_no_eval) + int(second_no_eval))
+    without_eval = int(first_no_eval) + int(second_no_eval)
 
-    new_row = pd.DataFrame([{
-        'Curricular Type': 'Total Units Without Eval',
-        'Total Units': without_eval
-    }])
-    
-    df = pd.concat([df, new_row], ignore_index=True)
+    if 'Total Units Without Eval' in df['Curricular Type'].values:
+        df.loc[df['Curricular Type'] == 'Total Units Without Eval', 'Total Units'] = without_eval
+    else:
+        new_row = pd.DataFrame([{
+            'Curricular Type': 'Total Units Without Eval',
+            'Total Units': without_eval
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
     
     return df, without_eval
+
 
 def calculate_approval_rate(df):
     total_approved = df[df['Curricular Type'] == 'Total Units Approved']['Total Units'].values[0]
     total_enrolled = df[df['Curricular Type'] == 'Total Units Enrolled']['Total Units'].values[0]
     
-    if total_approved != 0 or total_enrolled != 0:
-        approval_rate = (float(total_approved) /
-                        float(total_enrolled))
+    if total_enrolled != 0:
+        approval_rate = float(total_approved) / float(total_enrolled)
     else:
         approval_rate = 0.0
 
-    new_row = pd.DataFrame([{
-        'Curricular Type': 'Approval Rate',
-        'Total Units': approval_rate
-    }])
-
-    df = pd.concat([df, new_row], ignore_index=True)
+    if 'Approval Rate' in df['Curricular Type'].values:
+        df.loc[df['Curricular Type'] == 'Approval Rate', 'Total Units'] = approval_rate
+    else:
+        new_row = pd.DataFrame([{
+            'Curricular Type': 'Approval Rate',
+            'Total Units': approval_rate
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
 
     df = df.fillna(0)
-
+    
     return df, approval_rate
+
 
 def weighted_avg_grade(curricular_df, grade_df):
     first_sem_enroll = float(curricular_df[curricular_df['Curricular Type'] == '1st Semester Enrolled']['Total Units'].values[0])
@@ -79,15 +89,15 @@ def weighted_avg_grade(curricular_df, grade_df):
     else:
         weighted_grade = 0.0
 
-    # Tambahkan baris baru dengan weighted grade
-    new_row = pd.DataFrame([{
-        'Weighteg Avg Grade': weighted_grade,
-    }])
+    if 'Weighted Avg Grade' in grade_df.columns:
+        grade_df.at[0, 'Weighted Avg Grade'] = weighted_grade
+    else:
+        grade_df['Weighted Avg Grade'] = weighted_grade
 
-    grade_df = pd.concat([grade_df, new_row], ignore_index=True)
     grade_df = grade_df.fillna(0)
 
     return grade_df, weighted_grade
+
 
 
 def econ_pressure(*inputs):
