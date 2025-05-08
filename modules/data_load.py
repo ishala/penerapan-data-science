@@ -24,9 +24,11 @@ for file in file_list:
 curricular_df = pd.DataFrame([
     {'Curricular Type': '1st Semester Enrolled', 'Total Units': 0,},
     {'Curricular Type': '1st Semester Approved', 'Total Units': 0},
+    {'Curricular Type': '1st Semester Eval', 'Total Units': 0},
     {'Curricular Type': '1st Semester No Eval', 'Total Units': 0},
     {'Curricular Type': '2nd Semester Enrolled', 'Total Units': 0},
     {'Curricular Type': '2nd Semester Approved', 'Total Units': 0},
+    {'Curricular Type': '2nd Semester Eval', 'Total Units': 0},
     {'Curricular Type': '2nd Semester No Eval', 'Total Units': 0}
 ])
 
