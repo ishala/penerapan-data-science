@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-from modules.data_load import json_list
-from modules.data_preprocess import total_units_enrolled
+from modules.data_load import json_list, curricular_df, grade_df
+from modules.data_preprocess import *
 
 st.title('Student Status Predictions')
 st.subheader(':green[Graduate] vs :blue[Enrolled] vs :red[Dropout]', divider='gray')
@@ -104,14 +104,6 @@ st.markdown('## **Student Performances**')
 st.write('Please edit on the tables below!')
 
 st.markdown("### **Curricular Units**")
-curricular_df = pd.DataFrame([
-    {'Curricular Type': '1st Semester Enrolled', 'Total Units': 0,},
-    {'Curricular Type': '1st Semester Approved', 'Total Units': 0},
-    {'Curricular Type': '1st Semester No Eval', 'Total Units': 0},
-    {'Curricular Type': '2nd Semester Enrolled', 'Total Units': 0},
-    {'Curricular Type': '2nd Semester Approved', 'Total Units': 0},
-    {'Curricular Type': '2nd Semester No Eval', 'Total Units': 0}
-])
 
 edited_curr_df = st.data_editor(curricular_df, 
                                 hide_index=True,
@@ -119,23 +111,33 @@ edited_curr_df = st.data_editor(curricular_df,
 
 # Calculate Total Units Enrolled
 edited_curr_df, total_enrolled_un = total_units_enrolled(edited_curr_df)
-
+# Calculate Total Units Approved
+edited_curr_df, total_approved_un = total_units_approved(edited_curr_df)
+# Calculate Total Units No Eval
+edited_curr_df, without_eval = units_without_eval(edited_curr_df)
+# Calculate Approval Rate
+edited_curr_df, approval_rate = calculate_approval_rate(edited_curr_df)
+# Calculate Economic Pressure
+econ_press = econ_pressure(gender, marital, debtor, 
+                           unemploy_rate, inflation_rate)
 
 st.markdown("### **Student Grades**")
-grade_df = pd.DataFrame([
-    {
-    '1st Semester Grade': 0.0,
-    '2nd Semester Grade': 0.0,
-    'Admission Grade': 0.0,
-    'Previous Qualification Grade': 0.0
-    }
-])
+
 
 edited_grd_df = st.data_editor(grade_df, hide_index=True)
+
+# Calculate Weighted Avg Grade
+edited_grd_df, weighted_avg_grade = weighted_avg_grade(edited_curr_df, edited_grd_df)
 
 st.subheader(':blue[Student Performance Result]')
 
 col1_perform, col2_perform = st.columns(2)
 
 with col1_perform:
-    st.markdown('**Total Units Enrolled:**', total_enrolled_un)
+    st.markdown(f'**Total Units Enrolled:** {total_enrolled_un}')
+    st.markdown(f'**Total Units Approved:** {total_approved_un}')
+    st.markdown(f'**Total Units Without Eval:** {without_eval}')
+
+with col2_perform:
+    st.markdown(f'**Total Approval Rate:** {approval_rate}')
+    st.markdown(f'**Student Economy Pressure:** {econ_press}')
