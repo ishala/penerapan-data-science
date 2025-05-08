@@ -17,48 +17,87 @@ def total_units_enrolled(df):
     return df, total_enrolled_un
 
 def total_units_approved(df):
-    total_enrolled_un = (df['1st Semester Approved'] + 
-                         df['2nd Semester Approved'])
+    first_sem = df[df['Curricular Type'] == '1st Semester Approved']['Total Units'].values[0]
+    second_sem = df[df['Curricular Type'] == '2nd Semester Approved']['Total Units'].values[0]
+    total_approved_un = int(first_sem) + int(second_sem)
 
-    df['Total Units Approved'] = total_enrolled_un
-
-    return df
-
-def units_without_eval_col(df):
-    without_eval = (df['1st Semester No Eval'] +
-                    df['2nd Semester No Eval'])
-
-    df['Total Units Without Eval'] = without_eval
+    new_row = pd.DataFrame([{
+        'Curricular Type': 'Total Units Approved',
+        'Total Units': total_approved_un
+    }])
     
-    return df
+    df = pd.concat([df, new_row], ignore_index=True)
 
-def approval_rate_col(df):
-    approval_rate = (df['Total Units Approved'] /
-                     df['Total Units Enrolled'])
+    return df, total_approved_un
 
-    df['Approval Rate'] = approval_rate
-    df['Approval Rate'] = df['Approval Rate'].fillna(0)
+def units_without_eval(df):
+    first_no_eval = df[df['Curricular Type'] == '1st Semester No Eval']['Total Units'].values[0]
+    second_no_eval = df[df['Curricular Type'] == '2nd Semester No Eval']['Total Units'].values[0]
+    without_eval = (int(first_no_eval) + int(second_no_eval))
 
-    return df
+    new_row = pd.DataFrame([{
+        'Curricular Type': 'Total Units Without Eval',
+        'Total Units': without_eval
+    }])
+    
+    df = pd.concat([df, new_row], ignore_index=True)
+    
+    return df, without_eval
 
-def weighted_avg_grade_col(curricular_df, grade_df):
-    total_credits = (curricular_df['1st Semester Enrolled'] + curricular_df['1st Semester Enrolled'])
-    weigthed_grade = ((grade_df['1st Semester Grade'] * curricular_df['1st Semester Enrolled']) +
-                       (grade_df['2nd Semester Grade'] * curricular_df['2nd Semester Enrolled']) /
-                       total_credits) 
+def calculate_approval_rate(df):
+    total_approved = df[df['Curricular Type'] == 'Total Units Approved']['Total Units'].values[0]
+    total_enrolled = df[df['Curricular Type'] == 'Total Units Enrolled']['Total Units'].values[0]
+    
+    if total_approved != 0 or total_enrolled != 0:
+        approval_rate = (float(total_approved) /
+                        float(total_enrolled))
+    else:
+        approval_rate = 0.0
 
-    grade_df['Weighted Avg Grade'] = weigthed_grade
+    new_row = pd.DataFrame([{
+        'Curricular Type': 'Approval Rate',
+        'Total Units': approval_rate
+    }])
 
-    grade_df['Weighted Avg Grade'] = grade_df['Weighted Avg Grade'].fillna(0, axis=0)
+    df = pd.concat([df, new_row], ignore_index=True)
 
-    return grade_df
+    df = df.fillna(0)
 
-def econ_pressure_col(df):
-    marital_weight = np.where(df['Marital_status'] == 1, 1, 2)
-    debtor_weight = np.where(df['Debtor'] == 1, 1.5, 1)  # lebih berat kalau berutang
-    gender_weight = np.where(df['Gender'] == 1, 1.5, 1)
+    return df, approval_rate
+
+def weighted_avg_grade(curricular_df, grade_df):
+    first_sem_enroll = float(curricular_df[curricular_df['Curricular Type'] == '1st Semester Enrolled']['Total Units'].values[0])
+    second_sem_enroll = float(curricular_df[curricular_df['Curricular Type'] == '2nd Semester Enrolled']['Total Units'].values[0])
+    first_sem_grade = float(grade_df['1st Semester Grade'].values[0])
+    second_sem_grade = float(grade_df['2nd Semester Grade'].values[0])
+
+    total_credits = first_sem_enroll + second_sem_enroll
+
+    if total_credits > 0:
+        weighted_grade = ((first_sem_grade * first_sem_enroll) + 
+                          (second_sem_grade * second_sem_enroll)) / total_credits
+    else:
+        weighted_grade = 0.0
+
+    # Tambahkan baris baru dengan weighted grade
+    new_row = pd.DataFrame([{
+        'Weighteg Avg Grade': weighted_grade,
+    }])
+
+    grade_df = pd.concat([grade_df, new_row], ignore_index=True)
+    grade_df = grade_df.fillna(0)
+
+    return grade_df, weighted_grade
+
+
+def econ_pressure(*inputs):
+    gender, marital, debtor, unemploy_rt, inflation_rt = inputs
+    marital_weight = np.where(marital != 'Single', 1, 2)
+    debtor_weight = np.where(debtor == 'Yes', 1.5, 1)  
+    gender_weight = np.where(gender == 'Male', 1.5, 1)
 
     total_weight = marital_weight * debtor_weight * gender_weight
 
-    df['Econ_pressure'] = (df['Unemployment_rate'] * df['Inflation_rate']) * total_weight
-    return df
+    econ_pressure = (unemploy_rt * inflation_rt) * total_weight
+
+    return econ_pressure
