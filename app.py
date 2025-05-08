@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from modules.data_load import json_list, curricular_df, grade_df
 from modules.data_preprocess import *
+from modules.data_preparation import *
 
 st.title('Student Status Predictions')
 st.subheader(':green[Graduate] vs :blue[Enrolled] vs :red[Dropout]', divider='gray')
@@ -75,26 +76,28 @@ sec1_col1_eco, sec1_col2_eco = st.columns(2)
 
 # Section Tuition
 with sec1_col1_eco:
+    # Section Tuition
     tuition = st.radio(
         f'What\'s {pronoun} Tuition Status?',
         [v.capitalize() 
         for v in list(json_list['tuition_fees_val'].values())],
         horizontal=True
     )
-    
+    # Section Unemploy Rate
     unemploy_rate = st.number_input(
         f'How is {pronoun} Unemployment Rate?'
     )
 
 # Section Debtor
 with sec1_col2_eco:
+    # Section Debtor
     debtor = st.radio(
         f'What\'s {pronoun} Debtor Status?',
         [v.capitalize() 
         for v in list(json_list['debtor'].values())],
         horizontal=True
     )
-
+    # Section Inflation
     inflation_rate = st.number_input(
         f'How is {pronoun} Inflation Rate?'
     )
@@ -117,7 +120,7 @@ edited_curr_df, without_eval = units_without_eval(edited_curr_df)
 # Calculate Approval Rate
 edited_curr_df, approval_rate = calculate_approval_rate(edited_curr_df)
 # Calculate Economic Pressure
-econ_press = econ_pressure(gender, marital, debtor, 
+econ_press = econ_pressure(gender, marital, debtor,
                            unemploy_rate, inflation_rate)
 
 st.markdown("### **Student Grades**")
@@ -126,6 +129,7 @@ edited_grd_df = st.data_editor(grade_df, hide_index=True)
 # Calculate Weighted Avg Grade
 edited_grd_df, weighted_avg_grd = weighted_avg_grade(edited_curr_df, edited_grd_df)
 
+st.divider()
 st.subheader(':blue[Student Performance Result]')
 
 col1_perform, col2_perform = st.columns(2)
@@ -139,3 +143,49 @@ with col2_perform:
     st.markdown(f'**Total Approval Rate:** {approval_rate}')
     st.markdown(f'**Average Grade:** {weighted_avg_grd}')
     st.markdown(f'**Student Economy Pressure:** {econ_press}')
+
+# Collecting Data
+fixed_df = pd.DataFrame([{
+    'Approval_rate': approval_rate,
+    'Curricular_units_2nd_sem_approved': edited_curr_df[
+        edited_curr_df['Curricular Type'] == '2nd Semester Approved']['Total Units'].values[0],
+    'Total_units_approved': total_approved_un,
+    'Curricular_units_2nd_sem_grade': grade_df['2nd Semester Grade'].values[0],
+    'Curricular_units_1st_sem_approved': edited_curr_df[
+        edited_curr_df['Curricular Type'] == '1st Semester Approved']['Total Units'].values[0],
+    'Curricular_units_1st_sem_grade': grade_df['1st Semester Grade'].values[0],
+    'Weighted_avg_grade': weighted_avg_grd,
+    'Tuition_fees_up_to_date': tuition,
+    'Scholarship_holder': scholarship,
+    'Curricular_units_2nd_sem_enrolled': edited_curr_df[
+        edited_curr_df['Curricular Type'] == '2nd Semester Enrolled']['Total Units'].values[0],
+    'Total_units_enrolled': total_enrolled_un,
+    'Curricular_units_1st_sem_enrolled': edited_curr_df[
+        edited_curr_df['Curricular Type'] == '1st Semester Enrolled']['Total Units'].values[0],
+    'Admission_grade': grade_df['Admission Grade'].values[0],
+    'Displaced': displaced,
+    'Previous_qualification_grade': grade_df['Previous Qualification Grade'].values[0],
+    'Curricular_units_2nd_sem_evaluations': edited_curr_df[
+        edited_curr_df['Curricular Type'] == '2nd Semester Eval']['Total Units'].values[0],
+    'Total_units_without_eval': without_eval,
+    'Curricular_units_2nd_sem_without_evaluations': edited_curr_df[
+        edited_curr_df['Curricular Type'] == '2nd Semester No Eval']['Total Units'].values[0],
+    'Econ_pressure': econ_press,
+    'Application_mode': application_mode,
+    'Gender': gender,
+    'Debtor': debtor,
+    'Age_at_enrollment': age
+}])
+
+### Tambahkan Section Prediction, dan jalankan kode kebawah setelah
+### Submit Predict
+# Scaling Weighted Avg Grade
+# fixed_df = scaling_avg_grade(fixed_df)
+# # Encoding Categorical Data
+# encoded_df = encoding_data(fixed_df, json_list)
+
+# print(encoded_df)
+# PCA
+# pca_df = pca_helper(fixed_df)
+
+# print(pca_df)
