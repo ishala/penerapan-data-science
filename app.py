@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from modules.data_load import json_list, curricular_df, grade_df
 from modules.data_preprocess import *
-from modules.data_preparation import *
+from modules.modelling import *
 
 st.title('Student Status Predictions')
 st.subheader(':green[Graduate] vs :blue[Enrolled] vs :red[Dropout]', divider='gray')
@@ -144,48 +144,64 @@ with col2_perform:
     st.markdown(f'**Average Grade:** {weighted_avg_grd}')
     st.markdown(f'**Student Economy Pressure:** {econ_press}')
 
-# Collecting Data
-fixed_df = pd.DataFrame([{
-    'Approval_rate': approval_rate,
-    'Curricular_units_2nd_sem_approved': edited_curr_df[
-        edited_curr_df['Curricular Type'] == '2nd Semester Approved']['Total Units'].values[0],
-    'Total_units_approved': total_approved_un,
-    'Curricular_units_2nd_sem_grade': grade_df['2nd Semester Grade'].values[0],
-    'Curricular_units_1st_sem_approved': edited_curr_df[
-        edited_curr_df['Curricular Type'] == '1st Semester Approved']['Total Units'].values[0],
-    'Curricular_units_1st_sem_grade': grade_df['1st Semester Grade'].values[0],
-    'Weighted_avg_grade': weighted_avg_grd,
-    'Tuition_fees_up_to_date': tuition,
-    'Scholarship_holder': scholarship,
-    'Curricular_units_2nd_sem_enrolled': edited_curr_df[
-        edited_curr_df['Curricular Type'] == '2nd Semester Enrolled']['Total Units'].values[0],
-    'Total_units_enrolled': total_enrolled_un,
-    'Curricular_units_1st_sem_enrolled': edited_curr_df[
-        edited_curr_df['Curricular Type'] == '1st Semester Enrolled']['Total Units'].values[0],
-    'Admission_grade': grade_df['Admission Grade'].values[0],
-    'Displaced': displaced,
-    'Previous_qualification_grade': grade_df['Previous Qualification Grade'].values[0],
-    'Curricular_units_2nd_sem_evaluations': edited_curr_df[
-        edited_curr_df['Curricular Type'] == '2nd Semester Eval']['Total Units'].values[0],
-    'Total_units_without_eval': without_eval,
-    'Curricular_units_2nd_sem_without_evaluations': edited_curr_df[
-        edited_curr_df['Curricular Type'] == '2nd Semester No Eval']['Total Units'].values[0],
-    'Econ_pressure': econ_press,
-    'Application_mode': application_mode,
-    'Gender': gender,
-    'Debtor': debtor,
-    'Age_at_enrollment': age
-}])
-
-### Tambahkan Section Prediction, dan jalankan kode kebawah setelah
 ### Submit Predict
-# Scaling Weighted Avg Grade
-# fixed_df = scaling_avg_grade(fixed_df)
-# # Encoding Categorical Data
-# encoded_df = encoding_data(fixed_df, json_list)
+st.divider()
 
-# print(encoded_df)
-# PCA
-# pca_df = pca_helper(fixed_df)
+st.subheader('Student Prediction')
 
-# print(pca_df)
+col1_predict, col2_predict = st.columns(2)
+
+with col1_predict:
+    predict = st.button(label='Predict')
+    if predict:
+        # Collecting Data
+        fixed_df = pd.DataFrame([{
+            'Approval_rate': approval_rate,
+            'Curricular_units_2nd_sem_approved': edited_curr_df[
+                edited_curr_df['Curricular Type'] == '2nd Semester Approved']['Total Units'].values[0],
+            'Total_units_approved': total_approved_un,
+            'Curricular_units_2nd_sem_grade': grade_df['2nd Semester Grade'].values[0],
+            'Curricular_units_1st_sem_approved': edited_curr_df[
+                edited_curr_df['Curricular Type'] == '1st Semester Approved']['Total Units'].values[0],
+            'Curricular_units_1st_sem_grade': grade_df['1st Semester Grade'].values[0],
+            'Weighted_avg_grade': weighted_avg_grd,
+            'Tuition_fees_up_to_date': tuition,
+            'Scholarship_holder': scholarship,
+            'Curricular_units_2nd_sem_enrolled': edited_curr_df[
+                edited_curr_df['Curricular Type'] == '2nd Semester Enrolled']['Total Units'].values[0],
+            'Total_units_enrolled': total_enrolled_un,
+            'Curricular_units_1st_sem_enrolled': edited_curr_df[
+                edited_curr_df['Curricular Type'] == '1st Semester Enrolled']['Total Units'].values[0],
+            'Admission_grade': grade_df['Admission Grade'].values[0],
+            'Displaced': displaced,
+            'Previous_qualification_grade': grade_df['Previous Qualification Grade'].values[0],
+            'Curricular_units_2nd_sem_evaluations': edited_curr_df[
+                edited_curr_df['Curricular Type'] == '2nd Semester Eval']['Total Units'].values[0],
+            'Total_units_without_eval': without_eval,
+            'Curricular_units_2nd_sem_without_evaluations': edited_curr_df[
+                edited_curr_df['Curricular Type'] == '2nd Semester No Eval']['Total Units'].values[0],
+            'Econ_pressure': econ_press,
+            'Application_mode': application_mode,
+            'Gender': gender,
+            'Debtor': debtor,
+            'Age_at_enrollment': age
+        }])
+
+        # Scaling Weighted Avg Grade
+        fixed_df = scaling_avg_grade(fixed_df)
+        # Encoding Categorical Data
+        encoded_df = encoding_data(fixed_df, json_list)
+
+        # PCA
+        pca_df = pca_helper(fixed_df)
+
+        # Predictions
+        pred_res = predict_function(pca_df)[0]
+        if pred_res == 2:
+            class_res = ':green[Graduate]'
+        elif pred_res == 1:
+            class_res = ':yellow[Enrolled]'
+        elif pred_res == 0:
+            class_res = ':red[Dropout]'
+        
+        st.markdown(f'### Student Result: {class_res}')
