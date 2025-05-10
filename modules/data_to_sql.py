@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from data_load import json_list
 
 CURRENT_DIR = os.path.dirname(__file__)
-DATA_PATH = os.path.join(CURRENT_DIR, '..', 'data', 'data.csv')
+DATA_PATH = os.path.join(CURRENT_DIR, '..', 'data', 'modified_data.csv')
 
 DB_USER = 'postgres'
 DB_PASSWORD = 'root123'
@@ -16,7 +16,7 @@ conn_str = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 engine = create_engine(conn_str)
 
-df = pd.read_csv(DATA_PATH, encoding='utf-8-sig', sep=';')
+df = pd.read_csv(DATA_PATH)
 
 map_dict = {}
 
@@ -24,6 +24,8 @@ map_dict = {}
 for key in json_list.keys():
     map_dict[key] = {int(k): v for k, v in json_list[key].items()}
 
+# Add column Id
+df.insert(0, 'student_id', range(1, len(df) + 1))
 
 # Decoding Data
 df['Marital_status'] = df['Marital_status'] \
