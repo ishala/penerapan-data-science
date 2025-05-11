@@ -159,7 +159,7 @@ streamlit run app.py
 ```
 - Setelah itu klik Local URL atau akses di browser dengan url http://localhost:8501
 
-- Atau, karena sudah dilakukan *deployment* pada prototype, anda dapat mengaksesnya melalui link berikut
+- Atau, karena sudah dilakukan *deployment* pada prototype, anda dapat mengaksesnya melalui link berikut: https://student-predictions-ishala.streamlit.app/
 ## Conclusion
 
 Berdasarkan hasil analisis visual dari Business Dashboard yang terbagi dalam dua bagian utama, yaitu **Student’s Background** dan **Student’s Curricular Things**, dapat disimpulkan beberapa poin penting terkait performa mahasiswa dan faktor-faktor yang memengaruhi status mereka, khususnya terhadap kemungkinan dropout atau kelulusan:
