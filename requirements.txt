@@ -4,3 +4,4 @@ streamlit
 joblib
 scikit-learn
 tensorflow
+xgboost
