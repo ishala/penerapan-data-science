@@ -3,3 +3,4 @@ numpy
 streamlit
 joblib
 scikit-learn
+tensorflow
