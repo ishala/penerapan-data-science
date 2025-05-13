@@ -6,17 +6,43 @@ import numpy as np
 MODULE_DIR = os.path.dirname(__file__)
 
 PICKLE_PATH = os.path.join(MODULE_DIR, '..', 'models')
-SCALER_PATH = os.path.join(PICKLE_PATH, 'weightedAvgGrade.pkl')
+SCALER_PATH = os.path.join(PICKLE_PATH, 'scaler.pkl')
 PCA_PATH = os.path.join(PICKLE_PATH, 'pca.pkl')
 MODEL_PATH = os.path.join(PICKLE_PATH, 'xgb_model.pkl')
+TRANSFORM_PATH = os.path.join(PICKLE_PATH, 'powertransform.pkl')
 
-def scaling_avg_grade(df):
-    grade_scaler = joblib.load(SCALER_PATH)
+def transform_data(df, pt_cols):
+    pt = joblib.load(TRANSFORM_PATH)
+    df_cols = df.columns
 
-    df['Weighted_avg_grade'] = grade_scaler.transform(
-        pd.DataFrame(df['Weighted_avg_grade']))
+    for col in df_cols:
+        if col in pt_cols:
+            reshaped = df[[col]].values
+            transformed = pt.transform(reshaped)
+            df[col] = transformed
+        else:
+            continue
 
     return df
+
+def scaling_data(df, robust_cols):
+    scaler = joblib.load(SCALER_PATH)
+
+    # Pastikan kolom robust_cols semuanya ada di df
+    missing_cols = [col for col in robust_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Missing columns in input DataFrame: {missing_cols}")
+
+    # Urutkan kolom sesuai dengan urutan robust_cols
+    df_scaled_part = pd.DataFrame(scaler.transform(df[robust_cols]), 
+                                  columns=robust_cols, 
+                                  index=df.index)
+
+    # Ganti kolom lama dengan versi scaled
+    df.update(df_scaled_part)
+
+    return df
+
 
 def reversing_json(json_item):
     reversed_dict = {v.lower(): int(k) for k, v in json_item.items()}
@@ -43,11 +69,19 @@ def encoding_data(df, json_list):
 
     return df
 
-def pca_helper(df):
+def pca_helper(df, pca_cols):
     pca = joblib.load(PCA_PATH)
-    pca_df = pca.transform(df)
+
+    # Validasi kolom
+    missing_cols = [col for col in pca_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Missing columns in input DataFrame: {missing_cols}")
+
+    X_pca = df[pca_cols]
     
-    return pca_df
+    X_pca = pca.transform(X_pca)
+
+    return X_pca
 
 def predict_function(x_test):
     model = joblib.load(MODEL_PATH)
