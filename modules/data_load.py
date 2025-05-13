@@ -19,6 +19,33 @@ for file in file_list:
     with open(json_file_path, 'r') as json_f:
         json_list[key_name] = json.load(json_f)
 
+power_cols = ['Previous_qualification_grade', 'Admission_grade', 
+              'Age_at_enrollment', 'Curricular_units_1st_sem_credited', 
+              'Curricular_units_1st_sem_enrolled', 
+              'Curricular_units_1st_sem_evaluations', 
+              'Curricular_units_1st_sem_approved', 
+              'Curricular_units_1st_sem_grade', 
+              'Curricular_units_1st_sem_without_evaluations', 
+              'Curricular_units_2nd_sem_credited', 
+              'Curricular_units_2nd_sem_enrolled', 
+              'Curricular_units_2nd_sem_evaluations', 
+              'Curricular_units_2nd_sem_approved', 
+              'Curricular_units_2nd_sem_grade', 
+              'Curricular_units_2nd_sem_without_evaluations', 
+              'Unemployment_rate', 'Inflation_rate', 'GDP']
+
+robust_cols = ['Curricular_units_2nd_sem_approved', 
+               'Total_units_approved', 'Curricular_units_2nd_sem_grade', 
+               'Curricular_units_1st_sem_approved',
+               'Curricular_units_1st_sem_grade', 'Tuition_fees_up_to_date',
+               'Scholarship_holder', 'Weighted_avg_grade', 'Application_mode',
+               'Gender', 'Debtor', 'Age_at_enrollment', 'Approval_rate']
+
+pca_cols = ['Curricular_units_2nd_sem_approved', 'Total_units_approved',
+            'Curricular_units_2nd_sem_grade', 'Curricular_units_1st_sem_approved',
+            'Curricular_units_1st_sem_grade', 'Tuition_fees_up_to_date',
+            'Scholarship_holder', 'Weighted_avg_grade', 'Application_mode',
+            'Gender', 'Debtor', 'Age_at_enrollment', 'Approval_rate']
 
 # Template Dataframe
 curricular_df = pd.DataFrame([
