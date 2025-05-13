@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from modules.data_load import json_list, curricular_df, grade_df
+from modules.data_load import *
 from modules.data_preprocess import *
 from modules.modelling import *
 
@@ -187,13 +187,15 @@ with col1_predict:
             'Age_at_enrollment': age
         }])
 
-        # Scaling Weighted Avg Grade
-        fixed_df = scaling_avg_grade(fixed_df)
-        # Encoding Categorical Data
-        encoded_df = encoding_data(fixed_df, json_list)
+        # Transform Data
+        transformed_df = transform_data(fixed_df, power_cols)
+        # # Encoding Categorical Data
+        encoded_df = encoding_data(transformed_df, json_list)
+        # Scaling Data
+        scaled_df = scaling_data(encoded_df, robust_cols)
 
         # PCA
-        pca_df = pca_helper(fixed_df)
+        pca_df = pca_helper(fixed_df, pca_cols)
 
         # Predictions
         pred_res = predict_function(pca_df)[0]
