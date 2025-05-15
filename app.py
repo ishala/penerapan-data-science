@@ -29,7 +29,7 @@ with sec1_col2_profile:
         f'What\'s {pronoun} Application Mode?',
         [v.capitalize() 
         for v in list(json_list['application_mode_val'].values())],
-        index=None,
+        index=0,
         placeholder="Select the application mode..."
     )
 
@@ -37,7 +37,8 @@ with sec1_col2_profile:
 with sec1_col3_profile:
     age = st.text_input(
         f'What\'s {pronoun} Age at Enrollment?',
-        placeholder='e.g 20, 25, etc.'
+        placeholder='e.g 20, 25, etc.',
+        value='25'
     )
 
 # Marital Status Section
