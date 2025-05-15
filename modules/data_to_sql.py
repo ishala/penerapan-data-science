@@ -6,10 +6,10 @@ from data_load import json_list
 CURRENT_DIR = os.path.dirname(__file__)
 DATA_PATH = os.path.join(CURRENT_DIR, '..', 'data', 'modified_data.csv')
 
-DB_USER = 'postgres'
+DB_USER = 'postgres.uydwipcuxtobaiekcxxs'  
 DB_PASSWORD = 'root123'
-DB_HOST = 'localhost'
-DB_PORT = '5432'
+DB_HOST = 'aws-0-ap-southeast-1.pooler.supabase.com'
+DB_PORT = '6543'
 DB_NAME = 'postgres'
 
 conn_str = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
